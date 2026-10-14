@@ -30,4 +30,5 @@ Query flow: `POST /api/query` → `RAGSystem.query` → `AIGenerator` calls Clau
 
 ## Style
 
-- Format and lint with ruff (`uv run ruff format` / `uv run ruff check --fix`). A hook runs this on edited Python files.
+- Format with black (line length 100, configured in `pyproject.toml`) and lint with ruff. `./scripts/format.sh` formats and applies ruff fixes; `./scripts/check.sh` runs black --check, ruff check and pytest without modifying files.
+- A hook runs `ruff format` + `ruff check --fix` on edited Python files; its output matches black closely, but run `./scripts/format.sh` before committing.
