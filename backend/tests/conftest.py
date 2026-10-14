@@ -54,3 +54,36 @@ def tool_use_block(name="search_course_content", input=None, id="toolu_1"):
 
 def api_response(content, stop_reason="end_turn"):
     return SimpleNamespace(content=content, stop_reason=stop_reason)
+
+
+@pytest.fixture
+def sample_sources():
+    return [
+        {"text": "MCP Course - Lesson 2", "url": "https://example.com/lesson2"},
+        {"text": "MCP Course - Lesson 3", "url": None},
+    ]
+
+
+@pytest.fixture
+def mock_rag_system(sample_sources):
+    """A RAGSystem stand-in with canned query/analytics/session behaviour."""
+    from unittest.mock import MagicMock
+
+    rag = MagicMock()
+    rag.query.return_value = ("MCP is a protocol.", sample_sources)
+    rag.get_course_analytics.return_value = {
+        "total_courses": 2,
+        "course_titles": ["MCP Course", "Chroma Course"],
+    }
+    rag.session_manager.create_session.return_value = "session_1"
+    return rag
+
+
+@pytest.fixture
+def client(mock_rag_system, tmp_path):
+    """TestClient over the test app, with a stub index.html as the static frontend."""
+    from api_app import create_test_app
+    from fastapi.testclient import TestClient
+
+    (tmp_path / "index.html").write_text("<html><body>RAG Chatbot</body></html>")
+    return TestClient(create_test_app(mock_rag_system, tmp_path))
