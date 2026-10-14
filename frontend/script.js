@@ -31,6 +31,23 @@ function setupEventListeners() {
     });
     newChatButton.addEventListener('click', startNewChat);
 
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+    const updateToggleLabel = () => {
+        const isLight = root.getAttribute('data-theme') === 'light';
+        themeToggle.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
+    };
+    updateToggleLabel();
+    themeToggle.addEventListener('click', () => {
+        const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        root.classList.add('theme-transition');
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+        updateToggleLabel();
+        setTimeout(() => root.classList.remove('theme-transition'), 350);
+    });
+
     // Suggested questions
     document.querySelectorAll('.suggested-item').forEach(button => {
         button.addEventListener('click', (e) => {
